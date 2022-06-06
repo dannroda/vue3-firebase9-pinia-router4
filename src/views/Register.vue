@@ -1,26 +1,35 @@
+<template>
+<a-row>
+    <a-col :xs="{span: 24}" :sm="{span:18, offset: 3}">
+        <a-form name="basicRegister" autocomplete="off" layout="vertical" :model="formState" @finish="onFinish" @finishFailed="onFinishFailed">
+            <a-form-item name="email" label="Ingresa tu correo" :rules="[{ required: true, message: 'Ingrese un email', type: 'email'}]">
+                <a-input v-model:value="formState.email"></a-input>
+            </a-form-item>
+            <a-form-item name="password" label="Ingresa tu contraseña" :rules="[{ required: true, message: 'Ingrese una contraseña de 6 caracteres', min: 6}]">
+                <a-input-password v-model:value="formState.password"></a-input-password>
+            </a-form-item>
+            <a-form-item>
+                <a-button type="primary" html-type="submit" :disable="userStore.loadingUser">Crear</a-button>
+            </a-form-item>
+        </a-form>
+    </a-col>
+</a-row>
+</template>
+
 <script setup>
-import { ref } from 'vue';
+import { reactive} from 'vue';
 import { useUserStore } from '../stores/user';
-// import { useRouter } from 'vue-router';
 const userStore = useUserStore()
-// const router = useRouter()
-const email = ref('')
-const password = ref('')
-const handleSubmit = async () => {
-    if(!email.value || password.value.length < 6){
-        return alert('rellena los campos')
-        }
-    await userStore.registerUser(email.value, password.value)
-    // router.push('/')
+const formState = reactive({
+    email: '',
+    password: ''
+})
+
+const onFinish = async (values) => {
+    console.log('Completado', values)
+    await userStore.registerUser(formState.email, formState.password)
+}
+const onFinishFailed = errorInfo => {
+    console.log('Ha Fallado', errorInfo)
 }
 </script>
-<template>
-    <div>
-        <h1>Register</h1>
-<form @submit.prevent="handleSubmit">
-    <input type="email" placeholder="ingrese email" v-model.trim="email">
-    <input type="password" placeholder="ingrese pass" v-model.trim="password">
-    <button type="submit" :disabled="userStore.loadingUser">Crear</button>
-</form>
-    </div>
-</template>
